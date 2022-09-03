@@ -1,25 +1,5 @@
-07/Aug/2022 Complete Rewardia Task
-08/Aug/2022 automate python chapter 14
-08/Aug/2022 automate python chapter 15.1
-08/Aug/2022 auto-py code read-csv
-08/Aug/2022 auto-py code write.csv
-08/Aug/2022 auto-py code dict-write
-08/Aug/2022 auto-py code dict-read
-08/Aug/2022 rewardia maintainence
-08/Aug/2022 automate python chapter 15.2
-08/Aug/2022 auto-py code loadsCode
-09/Aug/2022 remove-header project auto-py
-09/Aug/2022 db-logic
-09/Aug/2022 flashcard-logic
-09/Aug/2022 mega-fc printLabel
-09/Aug/2022 mega-fc mainMenu
-09/Aug/2022 mega-fc fcViaNewSet
-10/Aug/2022 mega-fc printAbout
-10/Aug/2022 mega-fc fcViaExisting
-10/Aug/2022 mega-fc createMenu
-10/Aug/2022 mega-fc showAllSets
-10/Aug/2022 mega-fc reviewMenu
-10/Aug/2022 mega-fc reviewSet
-10/Aug/2022 mega-fc checkScore
-10/Aug/2022 mega-fc reviewRemix
-10/Aug/2022 mega-fc viewAllFlashcards
+03/Sep/2022 rewardia --main()
+03/Sep/2022 rewardia --exception
+03/Sep/2022 rewardia --resetData
+03/Sep/2022 rewardia --updateData
+03/Sep/2022 rewardia --getData
