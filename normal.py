@@ -11,6 +11,8 @@
 from colorama import Fore
 from sys import exit
 
+from requests import get
+
 # Print Logo
 def printBrand(brand, color = Fore.CYAN, symbol="#"):
     print(color)
@@ -62,8 +64,15 @@ def quitMe():
 def aboutMe():
     print(Fore.MAGENTA)
     print("="*40)
-    print("Name : Swarup Deepak Vishwas".center(40))
-    print("Github : @SwarupVishwas18".center(40))
-    print("Instagram : @swarup.vishwas".center(40))
-    print("Built With Peace 💝".center(40))
+    try:
+        result = get('https://swarupvishwas18.github.io/swarup-vishwas/api.json')
+    except:
+        print(Fore.RED)
+        print("You are not connected to Internet")
+    indic = result.json()
+    # print(indic)
+    print(f"Name : {indic['name']}")
+    for socialApp, socialId in indic['socials'].items():
+        print(f'{socialApp} : {socialId}')
+    print(indic['description'])
     print("="*40)
