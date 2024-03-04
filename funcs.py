@@ -9,33 +9,12 @@ from database import *
 
 
 db_obj = DB()
+logged_user = None
+
+ACQ_STATUS = 1
 
 
-def menu():
 
-    print(Fore.CYAN)
-
-    print()
-
-    print("1. Add Your Task")
-    print("2. View All Of Your Task")
-    print("3. Clear All Of Your Task")
-    print("4. Configure Settings")
-    print("5. View Current Reward")
-    print("6. About Me")
-    print("7. Quit")
-    while True:
-        try:
-            print(Fore.CYAN)
-            ch = int(input("Enter Your Choice : "))
-        except ValueError:
-            print(Fore.LIGHTRED_EX)
-            print("Enter Number Mate..!!")
-            print()
-        else:
-            break
-
-    return ch
 
 
 def getScore():
@@ -61,64 +40,49 @@ def checkReward():
     print("-" * 20)
 
 
-def addTask(task):
-    now = datetime.datetime.now()
-    st = now.strftime("%d/%b/%Y")
-    fs = open("tasks.txt", "a+")
-    fs.write(st + " " + task + "\n")
-    fs.close()
+def addTask(task, points):
+    db_obj.add_task(task, points, logged_user)
     print(Fore.LIGHTGREEN_EX)
     print("-" * 20)
     print("Task Added Successfully..!!")
     print("-" * 20)
-    score = getScore()
+    score = db_obj.get_points(logged_user)
     print("Total Score : ", score)
     checkReward()
 
 
 def displayTasks():
-    fs = open("tasks.txt", "r")
-    lines = fs.readlines()
-    fs.close()
+    tasks = db_obj.get_tasks()
     print(Fore.YELLOW)
     print("-" * 20)
     print("Your Total Tasks : ", getScore())
     i = 1
     print("-" * 20)
-    for line in lines:
-        print(i, ". ", line)
+    for task in tasks:
+        print(i, ". ", task[1])
+        print("POINTS : ", task[3])
         i += 1
 
 
 def clearTasks():
     print(Fore.RED)
     pwd = encoder.enencoderer(pyip.inputPassword("Enter The Password : "))
-    if pwd == settings.getData("Password"):
-        fs = open("tasks.txt", "w")
-        fs.write("")
-        fs.close()
-        fs = open("rewards.txt", "w")
-        fs.write("")
-        fs.close()
-        print("-" * 20)
+    if pwd == db_obj.get_password(logged_user):
+        db_obj.delete_tasks(logged_user)
         print("All Tasks Deleted Successfully..!!")
         print("-" * 20)
-
     else:
         print("Didn't Deleted Any Data Cause of Incorrect Password..!!")
 
 
-def getCurrentReward():
-    # TODO : Get Current Reward
-    rewardFile = open("rewards.txt", "r")
-    lines = rewardFile.readlines()
-    print(Fore.LIGHTGREEN_EX)
-    if len(lines) == 0:
-        print(Fore.RED)
-        print("Work Hard for Getting Reward..!!")
-        return None
-    print(lines[-1])
-    rewardFile.close()
+def displayAcquiredReward():
+    i = 1
+    print("-" * 30)
+
+    for reward in db_obj.get_rewards_by_status(logged_user, ACQ_STATUS):
+        print(i, " . ", reward[1])
+        print("Points : ", reward[2])
+        print("-" * 30)
 
 
 def addSeriesReward():
@@ -474,7 +438,7 @@ def login():
         if db_obj.get_password() == encoder.enencoderer(pwd):
             print(Fore.LIGHTGREEN_EX)
             print("Login Successfull..!!")
-
+            logged_user = db_obj.get_user_id()
             if choice == "yes":
                 with open("data.key", "w") as f:
                     f.write(db_obj.get_key())
@@ -506,7 +470,7 @@ def signup():
         print("Username is taken.!!")
         return None
     randText = encoder.getRandomString()
-    db_obj.insert_user(username, password, randText)
+    logged_user = db_obj.insert_user(username, password, randText)
     print(Fore.LIGHTGREEN_EX)
     print("SUCCESSFULLY SIGNED UP")
 
@@ -514,4 +478,4 @@ def signup():
         with open("secret.key", "w") as f:
             f.write(randText)
 
-    return username
+    return True

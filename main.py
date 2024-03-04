@@ -56,28 +56,27 @@ def main():
     sleep(3)
     while True:
 
-        ch = menu()
+        ch = normal.myMenu(["Add Task", "View Task"])
 
         if ch == 1:
-            # Add Task
             task = input("Enter Your Task : ")
-            addTask(task)
+            points = int(input("Enter the points : "))
+            addTask(task, points)
         elif ch == 2:
-            # View All Tasks Performed
             displayTasks()
         elif ch == 3:
             # Clear all Tasks
             clearTasks()
+        elif ch == 4:
+            configMenu()
+        elif ch == 5:
+            displayAcquiredReward()
+        elif ch == 6:
+            normal.aboutMe()
         elif ch == 7:
             # Quit
             normal.quitMe()
             break
-        elif ch == 6:
-            normal.aboutMe()
-        elif ch == 4:
-            configMenu()
-        elif ch == 5:
-            getCurrentReward()
         else:
             print(Fore.RED)
             print("Wrong Choice Try Again.!!")

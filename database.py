@@ -67,11 +67,19 @@ class DB:
         cur.execute("SELECT key  FROM users WHERE id=?", (user_id))
         return cur.fetchone()[0]
 
+    def get_user_id(self, user_name):
+        cur = self.conn.cursor()
+        cur.execute("SELECT user_id  FROM users WHERE username=?", (user_name))
+        return cur.fetchone()[0]
+
     def insert_user(self, username, pwd, key):
         cur = self.conn.cursor()
         cur.execute(
             "INSERT INTO (username, password, key) VALUES(?,?, ?)", (username, pwd, key)
         )
+        cur = self.conn.cursor()
+        cur.execute("SELECT id FROM users WHERE username=?", (username))
+        return cur.fetchone()[0]
 
     def get_points(self, user_id):
         cur = self.conn.cursor()
@@ -103,9 +111,20 @@ class DB:
         )
         return True
 
+    def delete_tasks(self, user_id):
+        cur = self.conn.cursor()
+        cur.execute("DELETE FROM tasks WHERE user_id=?", (user_id))
+
     def get_rewards(self, user_id):
         cur = self.conn.cursor()
         cur.execute("SELECT * FROM rewards WHERE user_id=?", (user_id))
+        return cur.fetchall()
+
+    def get_rewards_by_status(self, user_id, status):
+        cur = self.conn.cursor()
+        cur.execute(
+            "SELECT * FROM rewards WHERE user_id=? AND status=?", (user_id, status)
+        )
         return cur.fetchall()
 
     def delete_rewards(self, rew_id):
@@ -115,3 +134,7 @@ class DB:
         cur = self.conn.cursor()
         cur.execute("DELETE FROM rewards WHERE id=?", (rew_id))
         return pts
+
+    def update_reward_status(self, reward, status):
+        cur = self.conn.cursor()
+        cur.execute("UPDATE rewards SET status=? WHERE title=?", (status, reward))
