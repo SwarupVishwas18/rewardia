@@ -1,5 +1,6 @@
 # Author : Swarup Deepak Vishwas AKA Half Blood Prince
 import sys
+
 try:
     from colorama import Fore
 except:
@@ -13,58 +14,74 @@ import logging
 from datetime import datetime
 import settingsData as settings
 from time import sleep
+import os
+from normal import *
 
-logging.basicConfig(filename="log.txt",filemode='w', level=logging.DEBUG,
-                    format="%(asctime)s %(message)s")
+logging.basicConfig(
+    filename="log.txt",
+    filemode="w",
+    level=logging.DEBUG,
+    format="%(asctime)s %(message)s",
+)
+
 
 def main():
     print(Fore.MAGENTA)
     hr = datetime.now().hour
-    
+
+    if not os.path.isfile("data.key"):
+        printBrand("REWARDIA")
+        ch = myMenu(["Login", "Signup", "Quit"])
+        if ch == 1:
+            if login() is None:
+                quitMe()
+        elif ch == 2:
+            if signup() is None:
+                quitMe()
+        else:
+            quitMe()
+
     if hr < 12:
         greet = "Good Morning"
     elif hr < 16:
         greet = "Good Afternoon"
-    elif hr<22:
+    elif hr < 22:
         greet = "Good Evening"
     else:
         greet = "Good Night"
 
-    name = settings.getData('Name')
+    name = settings.getData("Name")
 
-    print(f'{greet} {name}....')
+    print(f"{greet} {name}....")
     sleep(3)
-    if isProtected():
-        login()
     while True:
-        
 
-        ch = menu()
+        ch = normal.myMenu(["Add Task", "View Task"])
 
-        if(ch==1):
-            # Add Task
+        if ch == 1:
             task = input("Enter Your Task : ")
-            addTask(task)
-        elif(ch==2):
-            # View All Tasks Performed
+            points = int(input("Enter the points : "))
+            addTask(task, points)
+        elif ch == 2:
             displayTasks()
-        elif(ch==3):
+        elif ch == 3:
             # Clear all Tasks
             clearTasks()
-        elif(ch==7):
+        elif ch == 4:
+            configMenu()
+        elif ch == 5:
+            displayAcquiredReward()
+        elif ch == 6:
+            normal.aboutMe()
+        elif ch == 7:
             # Quit
             normal.quitMe()
             break
-        elif ch==6:
-            normal.aboutMe()
-        elif(ch==4):
-            configMenu()
-        elif(ch==5):
-            getCurrentReward()
         else:
             print(Fore.RED)
             print("Wrong Choice Try Again.!!")
             # Check Option Again
+
 
 try:
     main()

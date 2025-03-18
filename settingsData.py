@@ -1,6 +1,6 @@
 import json
 from colorama import Fore
-from encoder import encrypter
+from crypt import encrypter
 
 def resetData(name="Half Blood Prince", pwd = "Shinigami", sm = 5, i = 10, big = 50):
     pwd = encrypter(pwd)
