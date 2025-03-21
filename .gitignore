@@ -1,4 +1,6 @@
 *.json
 *.txt
 *.pyc
+.vscode
+*.spec
 __pycache__/*

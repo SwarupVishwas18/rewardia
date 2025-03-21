@@ -1,6 +1,6 @@
 # rewardia
 
-Rewardia is CLI Based Gamified Python Productivity Application
+Rewardia is CLI Based Python Productivity Application
 
 1. Use have to add rewards ( There are Three Levels )
 2. You can then add completed tasks
@@ -21,3 +21,4 @@ Rewardia is CLI Based Gamified Python Productivity Application
 ## Output
 
 ![image](https://user-images.githubusercontent.com/91014156/183986970-de7ac505-8ae4-441e-a21d-ce2e4f644158.png)
+

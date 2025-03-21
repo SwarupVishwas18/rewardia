@@ -5,16 +5,35 @@ import os
 import pyinputplus as pyip
 import settingsData as settings
 import encoder
-from database import *
 
 
-db_obj = DB()
-logged_user = None
+def menu():
 
-ACQ_STATUS = 1
+    print(Fore.CYAN)
+    print("#" * 20)
+    print("Rewardia".center(20, " "))
+    print("#" * 20)
+    print()
 
+    print("1. Add Your Task")
+    print("2. View All Of Your Task")
+    print("3. Clear All Of Your Task")
+    print("4. Configure Settings")
+    print("5. View Current Reward")
+    print("6. About Me")
+    print("7. Quit")
+    while True:
+        try:
+            print(Fore.CYAN)
+            ch = int(input("Enter Your Choice : "))
+        except ValueError:
+            print(Fore.LIGHTRED_EX)
+            print("Enter Number Mate..!!")
+            print()
+        else:
+            break
 
-
+    return ch
 
 
 def getScore():
@@ -40,49 +59,64 @@ def checkReward():
     print("-" * 20)
 
 
-def addTask(task, points):
-    db_obj.add_task(task, points, logged_user)
+def addTask(task):
+    now = datetime.datetime.now()
+    st = now.strftime("%d/%b/%Y")
+    fs = open("tasks.txt", "a+")
+    fs.write(st + " " + task + "\n")
+    fs.close()
     print(Fore.LIGHTGREEN_EX)
     print("-" * 20)
     print("Task Added Successfully..!!")
     print("-" * 20)
-    score = db_obj.get_points(logged_user)
+    score = getScore()
     print("Total Score : ", score)
     checkReward()
 
 
 def displayTasks():
-    tasks = db_obj.get_tasks()
+    fs = open("tasks.txt", "r")
+    lines = fs.readlines()
+    fs.close()
     print(Fore.YELLOW)
     print("-" * 20)
     print("Your Total Tasks : ", getScore())
     i = 1
     print("-" * 20)
-    for task in tasks:
-        print(i, ". ", task[1])
-        print("POINTS : ", task[3])
+    for line in lines:
+        print(i, ". ", line)
         i += 1
 
 
 def clearTasks():
     print(Fore.RED)
-    pwd = encoder.enencoderer(pyip.inputPassword("Enter The Password : "))
-    if pwd == db_obj.get_password(logged_user):
-        db_obj.delete_tasks(logged_user)
+    pwd = encoder.encrypter(pyip.inputPassword("Enter The Password : "))
+    if pwd == settings.getData("Password"):
+        fs = open("tasks.txt", "w")
+        fs.write("")
+        fs.close()
+        fs = open("rewards.txt", "w")
+        fs.write("")
+        fs.close()
+        print("-" * 20)
         print("All Tasks Deleted Successfully..!!")
         print("-" * 20)
+
     else:
         print("Didn't Deleted Any Data Cause of Incorrect Password..!!")
 
 
-def displayAcquiredReward():
-    i = 1
-    print("-" * 30)
-
-    for reward in db_obj.get_rewards_by_status(logged_user, ACQ_STATUS):
-        print(i, " . ", reward[1])
-        print("Points : ", reward[2])
-        print("-" * 30)
+def getCurrentReward():
+    # TODO : Get Current Reward
+    rewardFile = open("rewards.txt", "r")
+    lines = rewardFile.readlines()
+    print(Fore.LIGHTGREEN_EX)
+    if len(lines) == 0:
+        print(Fore.RED)
+        print("Work Hard for Getting Reward..!!")
+        return None
+    print(lines[-1])
+    rewardFile.close()
 
 
 def addSeriesReward():
@@ -95,49 +129,33 @@ def addSeriesReward():
 
 
 def addReward():
-    # TODO : Add Rewards Here
-    # addRewardToFile(file, mov)
     ch = rewardMenu()
-
+    print("Enter the Rewards (wqz for quit) ")
+    isAutomated = (
+        True
+        if input(
+            "Is the reward is a series (like an episode of anime/manga so I can automate numbering it) [Y/n] : "
+        )
+        == "Y"
+        else False
+    )
     if ch == 1:
-        print("Enter the Small Rewards (wqz for quit) ")
-        while True:
-            rew = input("Enter The Reward : ").title()
-            if rew == "wqz".title():
-                print(Fore.LIGHTGREEN_EX)
-                print("All Small Rewards Has Been Added..!!")
-                return None
-            if rew == "":
-                print(Fore.RED)
-                print("Enter the Reward Name..!!")
-                continue
-            addRewardToFile("smallReward.txt", rew)
+        if isAutomated:
+            fillAutomated("smallReward.txt")
+        else:
+            fillManual("smallReward.txt", "Small")
+
     if ch == 2:
-        print("Enter the Intermediate Rewards (wqz for quit) ")
-        while True:
-            rew = input("Enter The Reward : ").title()
-            if rew == "wqz".title():
-                print(Fore.LIGHTGREEN_EX)
-                print("All Intermediate Rewards Has Been Added..!!")
-                return None
-            if rew == "":
-                print(Fore.RED)
-                print("Enter the Reward Name..!!")
-                continue
-            addRewardToFile("interReward.txt", rew)
+        if isAutomated:
+            fillAutomated("intermediateReward.txt")
+        else:
+            fillManual("intermediateReward.txt", "Intermediate")
+
     if ch == 3:
-        print("Enter the Big Rewards (wqz for quit) ")
-        while True:
-            rew = input("Enter The Reward : ").title()
-            if rew == "wqz".title():
-                print(Fore.LIGHTGREEN_EX)
-                print("All Big Rewards Has Been Added..!!")
-                return None
-            if rew == "":
-                print(Fore.RED)
-                print("Enter the Reward Name..!!")
-                continue
-            addRewardToFile("bigReward.txt", rew)
+        if isAutomated:
+            fillAutomated("bigReward.txt")
+        else:
+            fillManual("bigReward.txt", "Big")
 
 
 def gainZeroReward():
@@ -230,7 +248,12 @@ def removeFirstLine(filename):
     file.close()
     # print(lines)
     file = open(filename, "w")
-    ch = lines[0]
+    try:
+        ch = lines[0]
+    except:
+        print("You are dry on rewards mate!")
+        ch = input("So what do you want right now as reward : ")
+        print("Dont forget to add the rewards later!!!")
     for line in lines:
         if line == lines[0]:
             continue
@@ -267,7 +290,7 @@ def deleteReward():
         return None
 
     print("Enter your Password..!!")
-    if encoder.enencoderer(pyip.inputPassword()) != settings.getData("Password"):
+    if encoder.encrypter(pyip.inputPassword()) != settings.getData("Password"):
         print(Fore.RED)
         print("Incorrect Password..!!")
         return None
@@ -358,20 +381,18 @@ def displayData():
 
 
 def changePassword():
-    cur = input(
-        "Enter the current password ('Shinigami' if you are changing for 1st Time) : \n"
-    )
+    cur = input("Enter the current password : \n")
 
     getpwd = settings.getData("Password")
-    cur = encoder.enencoderer(cur)
+    cur = encoder.encrypter(cur)
 
     if cur != getpwd:
         print(Fore.RED)
         print("Incorrect Password : ")
         return None
 
-    pwd = encoder.enencoderer(input("Enter the New Password : \n"))
-    re = encoder.enencoderer(input("Re-enter the password : \n"))
+    pwd = encoder.encrypter(input("Enter the New Password : \n"))
+    re = encoder.encrypter(input("Re-enter the password : \n"))
 
     if re != pwd:
         print(Fore.RED)
@@ -409,7 +430,7 @@ def toggleProtection():
     cur = input("Enter the password : \n")
 
     getpwd = settings.getData("Password")
-    cur = encoder.enencoderer(cur)
+    cur = encoder.encrypter(cur)
 
     if cur != getpwd:
         print(Fore.RED)
@@ -428,54 +449,36 @@ def toggleProtection():
 
 def login():
     print(Fore.CYAN)
-    print("Enter Username : ")
-    username = pyip.inputStr()
     print("Enter Password : ")
     pwd = pyip.inputPassword()
-    choice = pyip.inputYesNo("Remember Me?")
 
-    if db_obj.user_exists(username):
-        if db_obj.get_password() == encoder.enencoderer(pwd):
-            print(Fore.LIGHTGREEN_EX)
-            print("Login Successfull..!!")
-            logged_user = db_obj.get_user_id()
-            if choice == "yes":
-                with open("data.key", "w") as f:
-                    f.write(db_obj.get_key())
-            return username
-        else:
-            print(Fore.RED)
-            print("Incorrect Password..!!")
+    if encoder.encrypter(pwd) == settings.getData("Password"):
+        print(Fore.LIGHTGREEN_EX)
+        print("Login Successfull..!!")
     else:
         print(Fore.RED)
-        print("Username not found..!!")
+        print("Login Failed..!!")
+        raise KeyboardInterrupt
 
-    return None
+
+def fillAutomated(filename):
+    name = input("Enter the name of series : ")
+    st = int(input("Enter starting point (inclusive)"))
+    end = int(input("Enter ending point (inclusive)"))
+
+    for i in range(st, end + 1):
+        addRewardToFile(filename, f"{name} - {i}")
 
 
-def signup():
-    print(Fore.CYAN)
-    username = pyip.inputStr("Enter Username : ")
-    password = pyip.inputPassword("Enter Password : ")
-    re_password = pyip.inputPassword("Re-enter Password : ")
-    me = pyip.inputYesNo("Remember Me? ")
-
-    if re_password != password:
-        print(Fore.RED)
-        print("Password Mismatch.!!")
-        return None
-
-    if db_obj.user_exists(username):
-        print(Fore.RED)
-        print("Username is taken.!!")
-        return None
-    randText = encoder.getRandomString()
-    logged_user = db_obj.insert_user(username, password, randText)
-    print(Fore.LIGHTGREEN_EX)
-    print("SUCCESSFULLY SIGNED UP")
-
-    if me == "yes":
-        with open("secret.key", "w") as f:
-            f.write(randText)
-
-    return True
+def fillManual(filename, type):
+    while True:
+        rew = input("Enter The Reward : ").title()
+        if rew == "wqz".title():
+            print(Fore.LIGHTGREEN_EX)
+            print(f"All {type} Rewards Has Been Added..!!")
+            return None
+        if rew == "":
+            print(Fore.RED)
+            print("Enter the Reward Name..!!")
+            continue
+        addRewardToFile(filename, rew)

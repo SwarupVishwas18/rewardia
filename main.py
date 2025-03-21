@@ -14,8 +14,6 @@ import logging
 from datetime import datetime
 import settingsData as settings
 from time import sleep
-import os
-from normal import *
 
 logging.basicConfig(
     filename="log.txt",
@@ -28,18 +26,6 @@ logging.basicConfig(
 def main():
     print(Fore.MAGENTA)
     hr = datetime.now().hour
-
-    if not os.path.isfile("data.key"):
-        printBrand("REWARDIA")
-        ch = myMenu(["Login", "Signup", "Quit"])
-        if ch == 1:
-            if login() is None:
-                quitMe()
-        elif ch == 2:
-            if signup() is None:
-                quitMe()
-        else:
-            quitMe()
 
     if hr < 12:
         greet = "Good Morning"
@@ -54,41 +40,46 @@ def main():
 
     print(f"{greet} {name}....")
     sleep(3)
+    if isProtected():
+        login()
     while True:
 
-        ch = normal.myMenu(["Add Task", "View Task"])
+        ch = menu()
 
         if ch == 1:
+            # Add Task
             task = input("Enter Your Task : ")
-            points = int(input("Enter the points : "))
-            addTask(task, points)
+            addTask(task)
         elif ch == 2:
+            # View All Tasks Performed
             displayTasks()
         elif ch == 3:
             # Clear all Tasks
             clearTasks()
-        elif ch == 4:
-            configMenu()
-        elif ch == 5:
-            displayAcquiredReward()
-        elif ch == 6:
-            normal.aboutMe()
         elif ch == 7:
             # Quit
             normal.quitMe()
             break
+        elif ch == 6:
+            normal.aboutMe()
+        elif ch == 4:
+            configMenu()
+        elif ch == 5:
+            getCurrentReward()
         else:
             print(Fore.RED)
             print("Wrong Choice Try Again.!!")
             # Check Option Again
 
 
-try:
-    main()
-except KeyboardInterrupt:
-    normal.quitMe()
-except Exception as e:
-    print(Fore.RED)
-    print("Something has been Wrong, Logging it to logs.txt")
-    logging.critical("Program has been Crashed via -> " + str(e).upper())
-    normal.quitMe()
+# try:
+#     main()
+# except KeyboardInterrupt:
+#     normal.quitMe()
+# except Exception as e:
+#     print(Fore.RED)
+#     print("Something has been Wrong, Logging it to logs.txt")
+#     logging.critical("Program has been Crashed via -> " + str(e).upper())
+#     normal.quitMe()
+
+main()
