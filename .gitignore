@@ -1,4 +1,5 @@
 *.json
+settings.json
 *.txt
 *.pyc
 .vscode
